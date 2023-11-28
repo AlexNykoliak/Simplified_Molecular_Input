@@ -10,7 +10,6 @@ from rdkit.Chem import Descriptors
 smiles = "COc1ccc(NC(=O)CN2C(=O)SC(CC(=O)Nc3nccs3)C2=O)cc1"
 
 
-# Створення молекули RDKit з SMILES формули
 molecule = Chem.MolFromSmiles(smiles)
 
 mol_weight = Descriptors.MolWt(molecule)

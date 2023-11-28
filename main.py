@@ -3,19 +3,24 @@ from rdkit import Chem
 from rdkit.Chem import Descriptors
 
 
-def calculate_descriptors(smiles):
-    molecule = Chem.MolFromSmiles(smiles)
-    return {
-        "Molecular Weight": Descriptors.MolWt(molecule),
-        "LogP": Descriptors.MolLogP(molecule),
-        "Num H Donors": Descriptors.NumHDonors(molecule),
-        "Num H Acceptors": Descriptors.NumHAcceptors(molecule),
-        "TPSA": Descriptors.TPSA(molecule)
-    }
+def getMolDescriptors(mol, missingVal=None):
+    result = {}
+    for nm, fn in Descriptors._descList:
+        try:
+            val = fn(mol)
+        except:
+            val = missingVal
+        result[nm] = val
+    return result
 
 
-df = pd.read_excel('Anticonv.Clon.ton.seiz..xlsx')
+file = pd.read_excel('Anticonv.Clon.ton.seiz..xlsx')
 
-df['Descriptors'] = df.iloc[:, 1].apply(calculate_descriptors)
+descriptors = file.iloc[:, 1].apply(
+    lambda x: getMolDescriptors(Chem.MolFromSmiles(x)))
 
-df.to_excel('output_with_descriptors.xlsx')
+new_data = pd.DataFrame(descriptors.tolist())
+
+result_df = pd.concat([file, new_data], axis=1)
+
+result_df.to_excel('output_with_descriptors.xlsx', index=False)
